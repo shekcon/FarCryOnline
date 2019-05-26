@@ -1,4 +1,13 @@
-CREATE DATABASE IF NOT EXISTS farcryonline ENCODING  "utf8" TEMPLATE template1;
+-- Usage: psql -U postgres < path_of_db_file
+
+-- Drop & Create database
+DROP DATABASE farcryonline;
+CREATE DATABASE farcryonline ENCODING  "utf8" TEMPLATE template1;
+
+-- Connect to database
+\c farcryonline
+
+-- For using uuid_generate_v1()
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS match (
@@ -43,23 +52,24 @@ CREATE TABLE IF NOT EXISTS player_keyBinding (
   sprint_position   text    NOT NULL
 );
 
+-- Create virtual table
 CREATE OR REPLACE VIEW match_statistics
 AS
     SELECT
-        match_id,
-        player_name,
-        SUM(kill_count) AS kill_count,
-        SUM(suicide_count) AS suicide_count,
-        SUM(death_count) AS death_count,
+        C.match_id,
+        C.player_name,
+        SUM(C.kill_count) AS kill_count,
+        SUM(C.suicide_count) AS suicide_count,
+        SUM(C.death_count) AS death_count,
         ROUND(
-            SUM(kill_count) * 100.0 / (SUM(kill_count) + SUM(death_count) + SUM(death_count)),
+            SUM(C.kill_count) * 100.0 / (SUM(C.kill_count) + SUM(C.death_count) + SUM(C.death_count)),
             2
         ) AS efficiency
     FROM
         (
         SELECT
             match_id,
-            killer_id AS player_name,
+            killer_name AS player_name,
             COUNT(victim_name) AS kill_count,
             COUNT(*) - COUNT(victim_name) AS suicide_count,
             0 AS death_count
@@ -68,16 +78,18 @@ AS
         UNION ALL
         SELECT
             match_id,   
-            victim_id AS player_name,
+            victim_name AS player_name,
             0 AS kill_count,
             0 AS suicide_count,
             count(victim_name) AS death_count
         FROM match_frag
-        WHERE player_name NOT NULL
+        WHERE victim_name is NOT NULL
         GROUP BY match_id, player_name
         ORDER BY match_id, player_name
-        )
+        ) C
 GROUP BY match_id, player_name;
+
+-- Add primary key contraint and foreign key contraint
 
 ALTER TABLE IF EXISTS character
     ADD CONSTRAINT fk_character_player_id 
@@ -86,8 +98,8 @@ ALTER TABLE IF EXISTS character
 
 ALTER TABLE IF EXISTS player_keyBinding
     ADD CONSTRAINT fk_player_keyBinding_player_id 
-    ADD FOREIGN KEY (player_id)
-    REFERENCES player(player_id);
+    FOREIGN KEY (player_id) REFERENCES player(player_id)
+    ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE IF EXISTS match
     ADD CONSTRAINT pk_match_match_id PRIMARY KEY (match_id);
@@ -96,4 +108,3 @@ ALTER TABLE IF EXISTS match_frag
     ADD CONSTRAINT fk_match_frag_match_id 
     FOREIGN KEY (match_id) REFERENCES match(match_id)
     ON UPDATE CASCADE ON DELETE RESTRICT;
-
