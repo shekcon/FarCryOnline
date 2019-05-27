@@ -29,28 +29,26 @@ CREATE TABLE IF NOT EXISTS match_frag (
 CREATE TABLE IF NOT EXISTS player (
     player_id 	    SERIAL      PRIMARY KEY,
     player_name     text        NOT NULL,
+    email           text        NOT NULL,
     passhash	    varchar(64) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS character (
+CREATE TABLE IF NOT EXISTS player_profile (
     player_id 	    int 	NOT NULL,
-    character_name 	uuid 	NOT NULL,
-    character_color int     NOT NULL
+    character_name 	text 	NOT NULL,
+    character_model text    NOT NULL,
+    character_color int     NOT NULL,
+    move_forward    text    NOT NULL,
+    move_left       text    NOT NULL,
+    move_right      text    NOT NULL,
+    jump            text    NOT NULL,
+    crouch          text    NOT NULL,
+    toggle_crouch   text    NOT NULL,
+    prone           text    NOT NULL,
+    walk            text    NOT NULL,
+    sprint_position text    NOT NULL        
 );
 
-
-CREATE TABLE IF NOT EXISTS player_keyBinding (
-  player_id         int     NOT NULL,
-  move_forward      text    NOT NULL,
-  move_left         text    NOT NULL,
-  move_right        text    NOT NULL,
-  jump              text    NOT NULL,
-  crouch            text    NOT NULL,
-  toggle_crouch     text    NOT NULL,
-  prone             text    NOT NULL,
-  walk              text    NOT NULL,
-  sprint_position   text    NOT NULL
-);
 
 -- Create virtual table
 CREATE OR REPLACE VIEW match_statistics
@@ -91,13 +89,8 @@ GROUP BY match_id, player_name;
 
 -- Add primary key contraint and foreign key contraint
 
-ALTER TABLE IF EXISTS character
-    ADD CONSTRAINT fk_character_player_id 
-    FOREIGN KEY (player_id) REFERENCES player(player_id)
-    ON UPDATE CASCADE ON DELETE RESTRICT;
-
-ALTER TABLE IF EXISTS player_keyBinding
-    ADD CONSTRAINT fk_player_keyBinding_player_id 
+ALTER TABLE IF EXISTS player_profile
+    ADD CONSTRAINT fk_player_profile_player_id 
     FOREIGN KEY (player_id) REFERENCES player(player_id)
     ON UPDATE CASCADE ON DELETE RESTRICT;
 
