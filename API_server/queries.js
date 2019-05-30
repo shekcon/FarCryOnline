@@ -10,6 +10,8 @@ const pool = new Pool({
 });
 
 
+
+
 const viewAllPlayer = (req, res) => {
     pool.query('SELECT * FROM player', (err, results) => {
         if (err) {

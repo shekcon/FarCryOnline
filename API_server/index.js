@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 
 // connect to database
 const db = require('./queries');
+const routes = require('./routes');
+
 
 // create an app 
 const app = express();
@@ -20,11 +22,13 @@ app.use(
 app.get('/', (req, res) => {
     res.json({ info: 'Node.js, Express and Postgres API'})
 });
-app.get('/players', db.viewAllPlayer);
-app.get('/player/:name', db.loginPlayer);
-app.post('/player', db.createPlayer);
-app.put('/player', db.updatePlayer);
-app.delete('/player', db.deletePLayer);
+// app.get('/players', db.viewAllPlayer);
+// app.get('/player/:name', db.loginPlayer);
+// app.post('/player', db.createPlayer);
+// app.put('/player', db.updatePlayer);
+// app.delete('/player', db.deletePLayer);
+
+routes(app);
 
 
 // listen
