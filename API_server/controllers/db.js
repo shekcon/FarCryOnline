@@ -1,9 +1,9 @@
 const Pool = require('pg').Pool;
 
-
+process.env.ADMISSION_DB_USER = 'postgres';
 const pool = new Pool({
-    user: 'postgres',
-    host: '18.188.223.17',
+    user: process.env.ADMISSION_DB_USER,
+    host: 'localhost',
     port: 5432,
     database: 'farcryonline',
     password: null

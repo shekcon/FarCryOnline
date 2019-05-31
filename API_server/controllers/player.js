@@ -10,8 +10,16 @@
             if (!player_name || !email || !password ) {
                 return res.status(400).send({ 'message': 'Please fill in required space.'})
             }
-            if (!/\S+@\S+\.\S+/.test(email)) {
+
+            // verify email
+            console.log('email format');
+            if (!/.+\@+\S+\.\S\w+/.test(email)) {
                 return res.status(400).send({ 'message': 'Please enter a valid email.'});
+            }
+
+            console.log('valid pass')
+            if (password.length < 8 || !/\S+/.test(password)) {
+                return res.status(400).send({ 'message': 'Password is too short or password contain white space.'})
             }
             const salt = bcrypt.genSaltSync(10);
             const hashpass = bcrypt.hashSync(password, salt);
@@ -28,9 +36,12 @@
                 if (error.routine === '_bt_check_unique') {
                     return res.status(400).send({ 'message': "Player with that name or email already signup."});
                 }
+                console.log(error);
                 return res.status(400).send(error);
             }
-        }
+        },
+
+        
     }
 
     // exports.Player = Player;

@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 // connect to database
-const db = require('./queries');
 const routes = require('./routes');
 
 
